@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using P137Pronia.Extensions;
 using P137Pronia.Services.Interfaces;
 using P137Pronia.ViewModels.SliderVMs;
 
@@ -34,9 +35,9 @@ namespace P137Pronia.Areas.Manage.Controllers
             {
                 if (sliderVM.ImageFile != null)
                 {
-                    if (!sliderVM.ImageFile.ContentType.StartsWith("image/"))
+                    if (!sliderVM.ImageFile.IsTypeValid("image"))
                         ModelState.AddModelError("ImageFile", "Wrong file type");
-                    if (sliderVM.ImageFile.Length > 2 * 1024 * 1024)
+                    if (sliderVM.ImageFile.IsSizeValid(2))
                         ModelState.AddModelError("ImageFile", "File max size is 2mb");
                 }
                 if (!ModelState.IsValid) return View();

@@ -1,0 +1,90 @@
+﻿
+@{
+    ViewData["Title"] = "Index";
+}
+@model List<Product>
+<a asp-action="Create" class="btn btn-success">Create</a>
+<table class="table table-dark mt-2">
+    <thead>
+        <tr>
+            @* @foreach (var item in columnNames)
+            {
+            <th>@item</th>
+            }*@
+            <th>Id</th>
+            <th>Name</th>
+            <th>Description</th>
+            <th>Price</th>
+            <th>Discount</th>
+            <th>StockCount</th>
+            <th>Rating</th>
+            <th>MainImage</th>
+            <th>Categories</th>
+            <th colspan="3">Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var product in Model)
+        {
+            <tr @(product.IsDeleted ? "class=bg-danger" :"")>
+                <td>@product.Id</td>
+                <td>@product.Name</td>
+                <td>@product.Description</td>
+                <td>@product.Price</td>
+                <td>@product.Discount</td>
+                <td>@product.StockCount</td>
+                <td>@product.Rating</td>
+                <td><img width="50" src="~/@product.MainImage" /></td>
+                <td>
+                    @foreach (var cat in product.ProductCategories)
+                    {
+                        @cat.Category?.Name <br />
+                    }
+                </td>
+                <td><a asp-action="Update" asp-route-id="@product.Id" class="btn btn-warning">Redakte et</a></td>
+                @if (!product.IsDeleted)
+                {
+                    <td><a asp-action="ChangeStatus" asp-route-id="@product.Id" class="btn btn-danger change-btn">Sil</a></td>
+                }
+                else
+                {
+                    <td><a asp-action="ChangeStatus" asp-route-id="@product.Id" class="btn btn-success change-btn">Bərpa et</a></td>
+                }
+                <td><a asp-action="Delete" asp-route-id="@product.Id" class="btn btn-secondary">Ömürlük sil</a></td>
+            </tr>
+        }
+    </tbody>
+</table>
+@section scripts{
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    @if ((bool?)TempData["IsDeleted"] == true)
+    {
+        <script>
+            Swal.fire(
+                'Dəyişdi!',
+                'success'
+            )
+        </script>
+    }
+    <script>
+        $(".change-btn").click(e => {
+            e.preventDefault();
+            let url = e.target.href;
+            Swal.fire({
+                title: 'Əminsiniz mi?',
+                text: "Bu əmri geri qaytarmq olmayacaq!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Hə',
+                cancelButtonText: 'Yox'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    window.location.href = url;
+                }
+            })
+        })
+    </script>
+}
+

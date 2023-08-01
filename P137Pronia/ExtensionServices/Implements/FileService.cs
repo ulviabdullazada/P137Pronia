@@ -30,19 +30,20 @@ public class FileService : IFileService
 		=> Guid.NewGuid() + Path.GetExtension(file.FileName);
 	private void _checkDirectory(string path)
 	{
-        if (Directory.Exists(path))
+        if (!Directory.Exists(Path.Combine(_env.WebRootPath,path)))
         {
-            Directory.CreateDirectory(path);
+            Directory.CreateDirectory(Path.Combine(_env.WebRootPath, path));
         }
     }
 
-	public async Task<string> UploadAsync(IFormFile file, string path, string contentType, int mb)
+	public async Task<string> UploadAsync(IFormFile file, string path, string contentType = "image", int mb = 2)
 	{
 		if (!file.IsSizeValid(mb)) throw new Exception();
 		if (!file.IsTypeValid(contentType)) throw new Exception();
 		string newFileName = _renameFile(file);
 		_checkDirectory(path);
-		await SaveAsync(file, Path.Combine(path, newFileName));
-		return newFileName;
+		path = Path.Combine(path, newFileName);
+		await SaveAsync(file, path);
+		return path;
 	}
 }

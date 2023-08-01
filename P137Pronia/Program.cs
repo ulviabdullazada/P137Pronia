@@ -16,10 +16,12 @@ namespace P137Pronia
             // Add services to the container.
             builder.Services.AddControllersWithViews();
 
-            builder.Services.AddScoped<ISliderService, SliderService>();
             builder.Services.AddScoped<IFileService, FileService>();
+            builder.Services.AddScoped<ISliderService, SliderService>();
+            builder.Services.AddScoped<IProductService, ProductService>();
+            builder.Services.AddScoped<ICategoryService, CategoryService>();
 
-            builder.Services.AddDbContext<ProniaDbContext>(opt =>
+			builder.Services.AddDbContext<ProniaDbContext>(opt =>
             {
                 opt.UseSqlServer(builder.Configuration["ConnectionStrings:MSSQL"]);
                 //opt.UseNpgsql();
@@ -33,7 +35,11 @@ namespace P137Pronia
                 app.UseExceptionHandler("/Shared/Error");
                 app.UseHsts();
             }
-			app.UseHttpsRedirection();
+            if (app.Environment.IsProduction())
+            {
+			    app.UseStatusCodePagesWithRedirects("~/error.html");
+            }
+            app.UseHttpsRedirection();
             app.UseStaticFiles();
 
             app.UseRouting();
@@ -49,7 +55,7 @@ namespace P137Pronia
             app.MapControllerRoute(
                 name: "default",
                 pattern: "{controller=Home}/{action=Index}/{id?}");
-			app.UseStatusCodePagesWithRedirects("/errors/{0}");
+
 
             app.Run();
         }
