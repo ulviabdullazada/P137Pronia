@@ -2,6 +2,9 @@
 @{
     ViewData["Title"] = "Index";
 }
+@section styles{
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css" />
+}
 @model HomeVM
 <!-- Begin Slider Area -->
 <input type="hidden" value="@ViewBag.ProductCount" id="prodCount">
@@ -799,6 +802,88 @@
                 .catch(e=>console.log(e))
             }
             
+        })
+    </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+    <script>
+        let prods = document.querySelectorAll(".feat-prod .pe-7s-cart");
+        document.getElementById('myTabContent').addEventListener("click", e=>{
+            e.preventDefault();
+            if(e.srcElement.classList.contains("pe-7s-cart"))
+            {
+                fetch(e.target.parentElement.href)
+                    .then(res => {
+                        if (res.ok) {
+                            let count = document.getElementById("basketCount").innerText;
+                            document.getElementById("basketCount").innerText = ++count;
+                            document.querySelector(".quantity.asd").innerText = count;
+                            Command: toastr["success"]("Səbətə əlavə olundu")
+
+                            toastr.options = {
+                                "closeButton": false,
+                                "debug": false,
+                                "newestOnTop": false,
+                                "progressBar": false,
+                                "positionClass": "toast-top-right",
+                                "preventDuplicates": false,
+                                "onclick": null,
+                                "showDuration": "300",
+                                "hideDuration": "1000",
+                                "timeOut": "5000",
+                                "extendedTimeOut": "1000",
+                                "showEasing": "swing",
+                                "hideEasing": "linear",
+                                "showMethod": "fadeIn",
+                                "hideMethod": "fadeOut"
+                            }
+                        }
+                        else {
+                            Command: toastr["error"]("Bir xəta baş verdi -else")
+
+                            toastr.options = {
+                                "closeButton": false,
+                                "debug": false,
+                                "newestOnTop": false,
+                                "progressBar": false,
+                                "positionClass": "toast-top-right",
+                                "preventDuplicates": false,
+                                "onclick": null,
+                                "showDuration": "300",
+                                "hideDuration": "1000",
+                                "timeOut": "5000",
+                                "extendedTimeOut": "1000",
+                                "showEasing": "swing",
+                                "hideEasing": "linear",
+                                "showMethod": "fadeIn",
+                                "hideMethod": "fadeOut"
+                            }
+                        }
+                    })
+                    .catch(() => {
+                        Command: toastr["error"]("Bir xəta baş verdi -catch")
+
+                        toastr.options = {
+                            "closeButton": false,
+                            "debug": false,
+                            "newestOnTop": false,
+                            "progressBar": false,
+                            "positionClass": "toast-top-right",
+                            "preventDuplicates": false,
+                            "onclick": null,
+                            "showDuration": "300",
+                            "hideDuration": "1000",
+                            "timeOut": "5000",
+                            "extendedTimeOut": "1000",
+                            "showEasing": "swing",
+                            "hideEasing": "linear",
+                            "showMethod": "fadeIn",
+                            "hideMethod": "fadeOut"
+                        }
+                    })
+            }
+            if (e.target.tagName.toLowerCase() === 'a') {
+                window.location.href = e.target.href; 
+            }
         })
     </script>
 }

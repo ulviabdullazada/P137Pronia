@@ -1,9 +1,8 @@
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using P137Pronia.DataAccess;
-using P137Pronia.ExtensionServices.Implements;
-using P137Pronia.ExtensionServices.Interfaces;
-using P137Pronia.Services.Implements;
-using P137Pronia.Services.Interfaces;
+using P137Pronia.Models;
+using P137Pronia.Services;
 
 namespace P137Pronia
 {
@@ -14,19 +13,27 @@ namespace P137Pronia
             var builder = WebApplication.CreateBuilder(args);
 
             // Add services to the container.
-            builder.Services.AddControllersWithViews();
+            builder.Services.AddControllersWithViews().AddNewtonsoftJson(options =>
+    options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore
+);
 
-            builder.Services.AddScoped<IFileService, FileService>();
-            builder.Services.AddScoped<ISliderService, SliderService>();
-            builder.Services.AddScoped<IProductService, ProductService>();
-            builder.Services.AddScoped<ICategoryService, CategoryService>();
+            builder.Services.AddServices();
+            builder.Services.AddSession();
 
-			builder.Services.AddDbContext<ProniaDbContext>(opt =>
+            builder.Services.AddDbContext<ProniaDbContext>(opt =>
             {
                 opt.UseSqlServer(builder.Configuration["ConnectionStrings:MSSQL"]);
                 //opt.UseNpgsql();
-            });
-
+            }).AddIdentity<AppUser, IdentityRole>(opt =>
+            {
+                opt.User.AllowedUserNameCharacters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789._";
+                opt.Password.RequireNonAlphanumeric = false;
+                opt.Password.RequiredLength = 8;
+                opt.Lockout.AllowedForNewUsers = false;
+                opt.Lockout.MaxFailedAccessAttempts = 3;
+                opt.SignIn.RequireConfirmedEmail = false;
+            }).AddDefaultTokenProviders().AddEntityFrameworkStores<ProniaDbContext>();
+            builder.Services.AddHttpContextAccessor();
             var app = builder.Build();
 
             // Configure the HTTP request pipeline.
@@ -39,12 +46,15 @@ namespace P137Pronia
             {
 			    app.UseStatusCodePagesWithRedirects("~/error.html");
             }
+            app.UseSession();
             app.UseHttpsRedirection();
             app.UseStaticFiles();
 
             app.UseRouting();
 
             app.UseAuthorization();
+            app.UseAuthentication();
+
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllerRoute(
